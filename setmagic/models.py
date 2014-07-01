@@ -13,6 +13,7 @@ class Setting(models.Model):
     name = models.CharField(max_length=20, unique=True)
     label = models.CharField(max_length=40)
     help_text = models.CharField(max_length=140)
+    current_value = models.TextField()
 
     def __str__(self):
         return '{name} ({label} - {group})'.format(
