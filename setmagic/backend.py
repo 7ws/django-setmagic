@@ -24,12 +24,15 @@ class SettingsBackend(object):
             group, new = Group.objects.get_or_create(label=group_label)
             self._groups.append(group)
 
+            # Sync settings
             for setting_line in group_settings:
-                setting, new = Setting.objects.get_or_create(
-                    group=group,
-                    name=setting_line['name'],
-                    label=setting_line['label'],
-                    help_text=setting_line['help_text'])
+                try:
+                    setting = Setting.objects.get(name=setting_line['name'])
+                except Setting.DoesNotExist:
+                    setting = Setting(name=setting_line['name'])
+                setting.__dict__.update(**setting_line)
+                setting.group = group
+                setting.save()
                 self._settings[setting.name] = setting
 
     def get(self, name):
@@ -40,11 +43,3 @@ class SettingsBackend(object):
 
     def set(self, name, value):
         Setting.objects.filter(name=name).update(current_value=value)
-
-
-def setting_line(name, label, help_text=None):
-    '''
-    A simple helper function make adding optional values to settings tuple
-    possible.
-    '''
-    return locals()

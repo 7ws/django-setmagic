@@ -1,13 +1,15 @@
 from django.test import SimpleTestCase, override_settings
 
 from setmagic import settings
-from setmagic.backend import setting_line as s
 from setmagic.models import Setting
 
 
 test_schema = [
     ('Test group', [
-        s('SETTING1', 'Setting 1', 'Help text for setting 1'),
+        dict(
+            name='SETTING1',
+            label='Setting 1',
+            help_text='Help text for setting 1'),
     ]),
 ]
 
