@@ -1,8 +1,9 @@
 {% extends 'admin/change_list.html' %}
-{% load admin_list %}
 
 
-{% block content %}
+{% block result_list %}
+
+	{{ cl.formset.management_form }}
 
 	{% regroup cl.formset.forms by instance.group as settings_formsets %}
 	{% for formset in settings_formsets %}
@@ -17,6 +18,9 @@
 							<h4>{{ form.instance.label }}</h4>
 							<p>{{ form.instance.help_text }}</p>
 							<p>(<em>{{ form.instance.name }}</em>)</p>
+
+							{# Hidden ID field #}
+							{{ form.id }}
 						</td>
 						<td>{{ form.current_value }}</td>
 					</tr>
@@ -27,4 +31,4 @@
 
 	{% endfor %}
 
-{% endblock content %}
+{% endblock result_list %}
