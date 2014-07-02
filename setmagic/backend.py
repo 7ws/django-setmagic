@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from setmagic.models import Group, Setting
 
 
@@ -17,7 +19,7 @@ class SettingsBackend(object):
         '''
 
         self._groups = []
-        self._settings = {}
+        self._settings = OrderedDict()
 
         for group_label, group_settings in groups:
             # Sync groups
