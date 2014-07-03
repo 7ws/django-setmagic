@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from setmagic import settings
@@ -22,5 +23,25 @@ class SetMagicAdmin(admin.ModelAdmin):
     def changelist_view(self, *args, **kwargs):
         settings._initialize()
         return super(SetMagicAdmin, self).changelist_view(*args, **kwargs)
+
+    def get_changelist_formset(self, request, **kwargs):
+        class Form(forms.ModelForm):
+
+            class Meta:
+                fields = self.list_display
+
+            def __init__(self, *args, **kwargs):
+                super(Form, self).__init__(*args, **kwargs)
+
+                # Do nothing for empty forms
+                if not self.instance.pk:
+                    return
+
+                # Set a custom field
+                custom_field = settings.defs[self.instance.name].get('field')
+                if custom_field:
+                    self.fields['current_value'] = custom_field
+
+        return forms.modelformset_factory(Setting, form=Form, extra=0)
 
 admin.site.register(Setting, SetMagicAdmin)

@@ -1,6 +1,7 @@
 from itertools import groupby
 import random
 
+from django import forms
 from django.core.urlresolvers import reverse
 from django.test import TransactionTestCase, override_settings
 from lxml import html
@@ -34,14 +35,21 @@ test_schema = [
             label='Setting 5',
             help_text='Help text for setting 5'),
     ]),
+    ('Typed settings group', [
+        dict(
+            name='EMAIL',
+            label='Test email',
+            help_text='Some text email',
+            field=forms.EmailField()),
+    ]),
 ]
 
 
 class SetMagicTestCase(TransactionTestCase):
 
     def setUp(self):
-        self.settings = SettingsWrapper()
-        self.settings._initialize()
+        self.setmagic = SettingsWrapper()
+        self.setmagic._initialize()
 
 
 @override_settings(SETMAGIC_SCHEMA=test_schema)
@@ -49,10 +57,10 @@ class GetSetSettingsTestCase(SetMagicTestCase):
 
     def test_set_setting(self):
         new_value = 'value1'
-        self.settings.SETTING1 = new_value
+        self.setmagic.SETTING1 = new_value
 
         # Check from the settings wrapper
-        self.assertEqual(self.settings.SETTING1, new_value)
+        self.assertEqual(self.setmagic.SETTING1, new_value)
 
         # Check directly from database
         self.assertTrue(Setting.objects.exists())
@@ -64,6 +72,10 @@ class GetSetSettingsTestCase(SetMagicTestCase):
 class SettingsAdminTestCase(SetMagicTestCase):
 
     fixtures = ['setmagic_test_users']
+    reset_sequences = True
+
+    def login(self):
+        self.client.login(username='root', password='123')
 
     def test_changelist_order(self):
         url = reverse('admin:setmagic_setting_changelist')
@@ -74,15 +86,16 @@ class SettingsAdminTestCase(SetMagicTestCase):
         for g, settings_lines in new_schema:
             random.shuffle(settings_lines)
 
-        with override_settings(SETMAGIC_SCHEMA=new_schema):
+        with self.settings(SETMAGIC_SCHEMA=new_schema):
             self.setUp()
-            self.client.login(username='root', password='123')
+            self.login()
+
             dom = html.fromstring(self.client.get(url).content)
 
             expected = [
                 (group.label, [setting.name for setting in settings_],)
                 for group, settings_ in groupby(
-                    self.settings._backend.settings.values(),
+                    self.setmagic._backend.settings.values(),
                     lambda s: s.group)]
 
             rendered = [
@@ -93,3 +106,10 @@ class SettingsAdminTestCase(SetMagicTestCase):
                 for section in dom.xpath('//*[@data-settings-formset]')]
 
             self.assertEqual(expected, rendered)
+
+    @override_settings(SETMAGIC_SCHEMA=test_schema)
+    def test_changelist_custom_field(self):
+        self.login()
+        url = reverse('admin:setmagic_setting_changelist')
+        dom = html.fromstring(self.client.get(url).content)
+        self.assertTrue(dom.xpath('//input[@type="email"]'))
