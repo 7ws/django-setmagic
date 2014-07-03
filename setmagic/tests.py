@@ -2,11 +2,11 @@ from itertools import groupby
 import random
 
 from django.core.urlresolvers import reverse
-from django.test import SimpleTestCase, TransactionTestCase, override_settings
+from django.test import TransactionTestCase, override_settings
 from lxml import html
 
-from setmagic import settings
 from setmagic.models import Setting
+from setmagic.wrapper import SettingsWrapper
 
 
 test_schema = [
@@ -37,15 +37,22 @@ test_schema = [
 ]
 
 
+class SetMagicTestCase(TransactionTestCase):
+
+    def setUp(self):
+        self.settings = SettingsWrapper()
+        self.settings._initialize()
+
+
 @override_settings(SETMAGIC_SCHEMA=test_schema)
-class GetSetSettingsTestCase(SimpleTestCase):
+class GetSetSettingsTestCase(SetMagicTestCase):
 
     def test_set_setting(self):
         new_value = 'value1'
-        settings.SETTING1 = new_value
+        self.settings.SETTING1 = new_value
 
         # Check from the settings wrapper
-        self.assertEqual(settings.SETTING1, new_value)
+        self.assertEqual(self.settings.SETTING1, new_value)
 
         # Check directly from database
         self.assertTrue(Setting.objects.exists())
@@ -53,34 +60,36 @@ class GetSetSettingsTestCase(SimpleTestCase):
         self.assertEqual(db_object.current_value, new_value)
 
 
-class SettingsAdminTestCase(TransactionTestCase):
+@override_settings(SETMAGIC_SCHEMA=[])
+class SettingsAdminTestCase(SetMagicTestCase):
 
     fixtures = ['setmagic_test_users']
 
     def test_changelist_order(self):
-        self.client.login(username='root', password='123')
         url = reverse('admin:setmagic_setting_changelist')
 
-        # Check a randomized the settings order many times
-        for i in range(10):
-            new_schema = test_schema[:]
-            random.shuffle(new_schema)
-            for g, settings_lines in new_schema:
-                random.shuffle(settings_lines)
+        # Check a randomized settings order
+        new_schema = test_schema[:]
+        random.shuffle(new_schema)
+        for g, settings_lines in new_schema:
+            random.shuffle(settings_lines)
 
-            with override_settings(SETMAGIC_SCHEMA=new_schema):
-                expected = [
-                    (group.label, [setting.name for setting in settings_],)
-                    for group, settings_ in groupby(
-                        settings._backend.settings.values(),
-                        lambda s: s.group)]
+        with override_settings(SETMAGIC_SCHEMA=new_schema):
+            self.setUp()
+            self.client.login(username='root', password='123')
+            dom = html.fromstring(self.client.get(url).content)
 
-                dom = html.fromstring(self.client.get(url).content)
-                rendered = [
-                    (
-                        section.xpath('h2/text()')[0],
-                        section.xpath('*//*[@data-setting-name]/text()'),
-                    )
-                    for section in dom.xpath('//*[@data-settings-formset]')]
+            expected = [
+                (group.label, [setting.name for setting in settings_],)
+                for group, settings_ in groupby(
+                    self.settings._backend.settings.values(),
+                    lambda s: s.group)]
 
-                self.assertEqual(expected, rendered)
+            rendered = [
+                (
+                    section.xpath('h2/text()')[0],
+                    section.xpath('*//*[@data-setting-name]/text()'),
+                )
+                for section in dom.xpath('//*[@data-settings-formset]')]
+
+            self.assertEqual(expected, rendered)
