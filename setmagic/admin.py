@@ -24,6 +24,9 @@ class SetMagicAdmin(admin.ModelAdmin):
         settings._initialize()
         return super(SetMagicAdmin, self).changelist_view(*args, **kwargs)
 
+    def get_queryset(self, request):
+        return Setting.objects.filter(name__in=settings.defs)
+
     def get_changelist_formset(self, request, **kwargs):
         class Form(forms.ModelForm):
 
