@@ -83,8 +83,6 @@ class SettingsAdminTestCase(SetMagicTestCase):
         # Check a randomized settings order
         new_schema = test_schema[:]
         random.shuffle(new_schema)
-        for g, settings_lines in new_schema:
-            random.shuffle(settings_lines)
 
         with self.settings(SETMAGIC_SCHEMA=new_schema):
             self.setUp()
@@ -93,10 +91,9 @@ class SettingsAdminTestCase(SetMagicTestCase):
             dom = html.fromstring(self.client.get(url).content)
 
             expected = [
-                (group.label, [setting.name for setting in settings_],)
-                for group, settings_ in groupby(
-                    self.setmagic._backend.settings.values(),
-                    lambda s: s.group)]
+                (group_label, [d['name'] for d in defs],)
+                for group_label, defs in groupby(
+                    self.setmagic.defs.values(), lambda d: d['group_label'])]
 
             rendered = [
                 (

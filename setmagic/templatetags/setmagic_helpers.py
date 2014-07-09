@@ -14,8 +14,9 @@ def organize_settings_formset(formset, *args):
     Group the settings form into groups and re-order them according to what is
     defined at SETMAGIC_SCHEMA.
     '''
-    order = [setting.id for setting in settings._backend.settings.values()]
-    formset = sorted(formset.forms, key=lambda f: order.index(f.instance.id))
+    form_map = {f.instance.name: f for f in formset.forms}
     return [
-        (group, list(forms),)
-        for group, forms in groupby(formset, lambda f: f.instance.group)]
+        (group_label, [form_map[d['name']] for d in defs])
+        for group_label, defs in groupby(
+            settings.defs.values(), lambda d: d['group_label'])
+    ]

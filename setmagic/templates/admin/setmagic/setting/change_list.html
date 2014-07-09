@@ -7,9 +7,9 @@
 	{{ cl.formset.management_form }}
 
 	{% organize_settings_formset cl.formset as formset %}
-	{% for group, forms in formset %}
+	{% for group_label, forms in formset %}
 		<section class="module" data-settings-formset>
-			<h2>{{ group.label }}</h2>
+			<h2>{{ group_label }}</h2>
 			<table>
 				<tbody>
 				{% for form in forms %}
