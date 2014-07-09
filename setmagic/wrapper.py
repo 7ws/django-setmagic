@@ -18,7 +18,7 @@ class SettingsWrapper(object):
         '''
         Lazily load the backend
         '''
-        if self._backend:
+        if self._backend and 'test' not in sys.argv:
             return
 
         super(SettingsWrapper, self).__setattr__(
