@@ -27,11 +27,11 @@ class SetMagicAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return Setting.objects.filter(name__in=settings.defs)
 
-    def get_changelist_formset(self, request, **kwargs):
+    def get_changelist_form(self, *args, **kwargs):
         class Form(forms.ModelForm):
 
             class Meta:
-                fields = self.list_display
+                fields = self.list_editable
 
             def __init__(self, *args, **kwargs):
                 super(Form, self).__init__(*args, **kwargs)
@@ -45,6 +45,6 @@ class SetMagicAdmin(admin.ModelAdmin):
                 if custom_field:
                     self.fields['current_value'] = custom_field
 
-        return forms.modelformset_factory(Setting, form=Form, extra=0)
+        return Form
 
 admin.site.register(Setting, SetMagicAdmin)

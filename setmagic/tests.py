@@ -74,7 +74,8 @@ class SettingsAdminTestCase(SetMagicTestCase):
     fixtures = ['setmagic_test_users']
     reset_sequences = True
 
-    def login(self):
+    def setUp(self):
+        super(SettingsAdminTestCase, self).setUp()
         self.client.login(username='root', password='123')
 
     def test_changelist_order(self):
@@ -86,7 +87,6 @@ class SettingsAdminTestCase(SetMagicTestCase):
 
         with self.settings(SETMAGIC_SCHEMA=new_schema):
             self.setUp()
-            self.login()
 
             dom = html.fromstring(self.client.get(url).content)
 
@@ -106,7 +106,6 @@ class SettingsAdminTestCase(SetMagicTestCase):
 
     @override_settings(SETMAGIC_SCHEMA=test_schema)
     def test_changelist_custom_field(self):
-        self.login()
         url = reverse('admin:setmagic_setting_changelist')
         dom = html.fromstring(self.client.get(url).content)
         self.assertTrue(dom.xpath('//input[@type="email"]'))
