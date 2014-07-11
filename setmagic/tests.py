@@ -15,7 +15,8 @@ test_schema = [
         dict(
             name='SETTING1',
             label='Setting 1',
-            help_text='Help text for setting 1'),
+            help_text='Help text for setting 1',
+            default='Default value'),
         dict(
             name='SETTING2',
             label='Setting 2',
@@ -66,6 +67,13 @@ class GetSetSettingsTestCase(SetMagicTestCase):
         self.assertTrue(Setting.objects.exists())
         db_object = Setting.objects.get(name='SETTING1')
         self.assertEqual(db_object.current_value, new_value)
+        self.assertEqual(db_object.current_value, new_value)
+
+    def test_setting_default_value(self):
+        # The default value is pre-set at the setting
+        self.assertEqual(
+            self.setmagic.SETTING1,
+            self.setmagic.defs['SETTING1']['default'])
 
 
 @override_settings(SETMAGIC_SCHEMA=[])

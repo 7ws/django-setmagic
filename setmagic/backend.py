@@ -21,16 +21,16 @@ class SettingsBackend(object):
             try:
                 setting = Setting.objects.get(name=setting_def['name'])
             except Setting.DoesNotExist:
-                setting = Setting(name=setting_def['name'])
+                name = setting_def['name']
+                setting = Setting(
+                    name=name,
+                    current_value=self.defs[name].get('default'))
 
             setting.__dict__.update(**setting_def)
             setting.save()
 
     def get(self, name):
-        try:
-            return Setting.objects.get(name=name).current_value
-        except Setting.DoesNotExist:
-            return
+        return Setting.objects.get(name=name).current_value
 
     def set(self, name, value):
         Setting.objects.filter(name=name).update(current_value=value)
