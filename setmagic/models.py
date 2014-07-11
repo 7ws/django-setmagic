@@ -5,7 +5,7 @@ class Setting(models.Model):
     name = models.CharField(max_length=20, unique=True)
     label = models.CharField(max_length=40)
     help_text = models.CharField(max_length=140)
-    current_value = models.TextField()
+    current_value = models.CharField(max_length=100)
 
     class Meta:
         app_label = 'setmagic'
