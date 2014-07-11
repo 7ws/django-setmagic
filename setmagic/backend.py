@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from setmagic.models import Setting
 
 
@@ -12,23 +10,21 @@ class SettingsBackend(object):
 
     settings = property(lambda self: self._settings)
 
-    def __init__(self, groups):
+    def __init__(self, settings_defs):
         '''
         Sync settings schema to both the backend and database
         '''
 
-        self._settings = OrderedDict()
+        self.defs = settings_defs
 
-        for group_label, group_settings in groups:
-            # Sync settings
-            for setting_line in group_settings:
-                try:
-                    setting = Setting.objects.get(name=setting_line['name'])
-                except Setting.DoesNotExist:
-                    setting = Setting(name=setting_line['name'])
-                setting.__dict__.update(**setting_line)
-                setting.save()
-                self._settings[setting.name] = setting
+        for setting_def in settings_defs.values():
+            try:
+                setting = Setting.objects.get(name=setting_def['name'])
+            except Setting.DoesNotExist:
+                setting = Setting(name=setting_def['name'])
+
+            setting.__dict__.update(**setting_def)
+            setting.save()
 
     def get(self, name):
         try:

@@ -49,7 +49,7 @@ class SetMagicTestCase(TransactionTestCase):
 
     def setUp(self):
         self.setmagic = SettingsWrapper()
-        self.setmagic._initialize()
+        self.setmagic._sync()
 
 
 @override_settings(SETMAGIC_SCHEMA=test_schema)

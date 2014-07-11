@@ -21,7 +21,7 @@ class SetMagicAdmin(admin.ModelAdmin):
         return self.opts.get_all_field_names()
 
     def changelist_view(self, *args, **kwargs):
-        settings._initialize()
+        settings._sync()
         return super(SetMagicAdmin, self).changelist_view(*args, **kwargs)
 
     def get_queryset(self, request):

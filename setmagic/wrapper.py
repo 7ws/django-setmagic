@@ -14,15 +14,12 @@ class SettingsWrapper(object):
     def __init__(self):
         super(SettingsWrapper, self).__setattr__('_backend', None)
 
-    def _initialize(self):
+    def _sync(self):
         '''
         Lazily load the backend
         '''
         if self._backend and 'test' not in sys.argv:
             return
-
-        super(SettingsWrapper, self).__setattr__(
-            '_backend', SettingsBackend(settings.SETMAGIC_SCHEMA))
 
         # Cache all setting defs into a single dict
         super(SettingsWrapper, self).__setattr__('defs', OrderedDict())
@@ -31,10 +28,13 @@ class SettingsWrapper(object):
                 setting_def['group_label'] = group_label
                 self.defs[setting_def['name']] = setting_def
 
+        super(SettingsWrapper, self).__setattr__(
+            '_backend', SettingsBackend(self.defs))
+
     def __getattr__(self, name):
-        self._initialize()
+        self._sync()
         return self._backend.get(name)
 
     def __setattr__(self, name, value):
-        self._initialize()
+        self._sync()
         self._backend.set(name, value)
