@@ -2,9 +2,9 @@ from django.db import models
 
 
 class Setting(models.Model):
-    name = models.CharField(max_length=20, unique=True)
-    label = models.CharField(max_length=40)
-    help_text = models.CharField(max_length=140)
+    name = models.CharField(max_length=40, unique=True)
+    label = models.CharField(max_length=60)
+    help_text = models.TextField()
     current_value = models.CharField(max_length=100)
 
     class Meta:
