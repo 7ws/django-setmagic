@@ -48,6 +48,8 @@ class SetMagicAdmin(admin.ModelAdmin):
                         module, name = custom_field.rsplit('.', 1)
                         custom_field = getattr(import_module(module), name)()
                     self.fields['current_value'] = custom_field
+                else:
+                    self.fields['current_value'] = forms.CharField()
 
         return Form
 
