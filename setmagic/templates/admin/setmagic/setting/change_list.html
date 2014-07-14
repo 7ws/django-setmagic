@@ -6,6 +6,7 @@
 {% block extrastyle %}
 {{ block.super }}
 	<link rel="stylesheet" href="{% static 'admin/setmagic.css' %}">
+
 {% endblock extrastyle %}
 
 
@@ -29,7 +30,10 @@
 							{# Hidden ID field #}
 							{{ form.id }}
 						</td>
-						<td>{{ form.current_value }}</td>
+						<td>
+							{{ form.media }}
+							{{ form.current_value }}
+						</td>
 					</tr>
 				{% endfor %}
 				</tbody>
