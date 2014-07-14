@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.utils.importlib import import_module
 
 from setmagic import settings
 from setmagic.models import Setting
@@ -43,6 +44,9 @@ class SetMagicAdmin(admin.ModelAdmin):
                 # Set a custom field
                 custom_field = settings.defs[self.instance.name].get('field')
                 if custom_field:
+                    if isinstance(custom_field, str):
+                        module, name = custom_field.rsplit('.', 1)
+                        custom_field = getattr(import_module(module), name)()
                     self.fields['current_value'] = custom_field
 
         return Form
