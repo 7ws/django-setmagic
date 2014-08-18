@@ -1,8 +1,13 @@
-from collections import OrderedDict
 import sys
 
 from django.conf import settings
 from setmagic.backend import SettingsBackend
+
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 
 class SettingsWrapper(object):

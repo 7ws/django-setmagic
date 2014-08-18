@@ -10,9 +10,9 @@ _denied = lambda *args: False
 
 
 class SetMagicAdmin(admin.ModelAdmin):
-    list_display = 'label', 'current_value',
-    list_editable = 'current_value',
-    list_display_links = None
+    list_display = ('label', 'current_value',)
+    list_editable = ('current_value',)
+    list_display_links = ()
 
     has_add_permission = _denied
     has_delete_permission = _denied

@@ -11,7 +11,7 @@ class Setting(models.Model):
         app_label = 'setmagic'
 
     def __str__(self):
-        return '{name} ({label})'.format(
+        return u'{name} ({label})'.format(
             name=self.name,
             label=self.label,
         )
