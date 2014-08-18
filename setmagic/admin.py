@@ -51,6 +51,9 @@ class SetMagicAdmin(admin.ModelAdmin):
                 else:
                     self.fields['current_value'] = forms.CharField()
 
+                # Make the field non-required
+                self.fields['current_value'].required = False
+
         return Form
 
 admin.site.register(Setting, SetMagicAdmin)
