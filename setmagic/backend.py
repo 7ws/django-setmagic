@@ -1,4 +1,5 @@
 from setmagic.models import Setting
+from .exceptions import NoSuchSettingError
 
 
 class SettingsBackend(object):
@@ -30,7 +31,10 @@ class SettingsBackend(object):
             setting.save()
 
     def get(self, name):
-        return Setting.objects.get(name=name).current_value
+        try:
+            return Setting.objects.get(name=name).current_value
+        except Setting.DoesNotExist:
+            raise NoSuchSettingError(name)
 
     def set(self, name, value):
         Setting.objects.filter(name=name).update(current_value=value)
