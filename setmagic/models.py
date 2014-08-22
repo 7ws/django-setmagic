@@ -1,6 +1,8 @@
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class Setting(models.Model):
     name = models.CharField(max_length=40, unique=True)
     label = models.CharField(max_length=60)
