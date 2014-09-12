@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-setmagic',
-    version='0.2.1',
+    version='0.2.2',
     author='Evandro Myller',
     author_email='emyller@7ws.co',
     description='Magically editable settings for winged pony lovers',
