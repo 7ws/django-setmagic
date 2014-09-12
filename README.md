@@ -25,6 +25,14 @@ Django project's `INSTALLED_APPS` setting.
 		...
 	]
 
+Also enable the SetMagic template context processor, if you want to use it on
+your templates, by adding it to the `TEMPLATE_CONTEXT_PROCESSORS` list:
+
+	TEMPLATE_CONTEXT_PROCESSORS = [
+		...
+		'setmagic.context_processors.load_setmagic',
+	]
+
 Create the necessary tables, like usual:
 
 	$ python manage.py syncdb
@@ -66,10 +74,15 @@ values on your code.
 	settings.FACEBOOK_APP_ID = '000000000000000'
 
 	# Retrieve the setting value from the database
-	print(settings.FACEBOOK_ID)
+	print(settings.FACEBOOK_APP_ID)
 
 	# Deletes it from the database
-	del settings.FACEBOOK_ID
+	del settings.FACEBOOK_APP_ID
+
+If you added the template context processor like described above, you can also
+use SetMagic values on your templates.
+
+	<p>My Facebook app ID is <code>{{ setmagic.FACEBOOK_APP_ID }}</code></p>
 
 See? No mistery. :)
 
