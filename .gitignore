@@ -1,2 +1,7 @@
+# Python byte-compiled files
 __pycache__
 *.pyc
+
+# setuptools stuff
+/dist/
+*.egg-info
